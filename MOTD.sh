@@ -63,7 +63,7 @@ echo -e " ${C0}+                    +                     +         +
 echo -e " ${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
 ${C1} + ${C3}Hostname       ${C1}=  ${C4}`hostname`
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}`wget http://ipinfo.io/ip -qO -` ${C0}(`ip addr list eth0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1`)
-${C1} + ${C3}Uptime         ${C1}=  ${C4}`uptime -p | awk '{for (i=2; i<=NF; i++) printf $i " ";}'`
+${C1} + ${C3}Uptime         ${C1}=  ${C4}`uptime | gawk '{ if (match($0, /up .*min,/,m)) { print substr(m[0], 1, length(m[0])-1); } else { print substr($3, 1, length($3)-1); } }' | sed -e 's/up //g'`
 ${C1} + ${C3}Time           ${C1}=  ${C0}`date`
 ${C1} + ${C3}CPU T°         ${C1}=  ${C0}$cur_temperature°C
 ${C1} + ${C3}Load Averages  ${C1}=  ${C4}${one}, ${five}, ${fifteen} ${C0}(1, 5, 15 min)
