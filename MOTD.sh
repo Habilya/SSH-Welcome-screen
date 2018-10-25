@@ -61,7 +61,7 @@ echo -e " ${C0}+                    +                     +         +
 "
 
 echo -e " ${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
-${C1} + ${C3}Hostname       ${C1}=  ${C4}`hostname --fqdn`
+${C1} + ${C3}Hostname       ${C1}=  ${C4}`hostname` ${C0}(`hostname --fqdn`)
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}`wget http://ipinfo.io/ip -qO -` ${C0}(`ip addr list eth0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1`)
 ${C1} + ${C3}Uptime         ${C1}=  ${C4}`uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* users.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/'`
 ${C1} + ${C3}Time           ${C1}=  ${C0}`date`
