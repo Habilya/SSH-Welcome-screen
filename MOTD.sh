@@ -23,8 +23,13 @@ ADMINS=`cat /etc/group | grep --regex "^sudo" | awk -F: '{print $4}' | tr ',' '|
 ADMINSLIST=`grep -E $ADMINS /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk {'print $5,$6,"("$1")"'} | tr '\n' ',' | sed '$s/.$//'`
 UPDATESAVAIL=`cat /var/zzscriptzz/MOTD/updates-available.dat`
 
-cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
-cur_temperature=$(echo "$cur_temperature/1000" | bc -l | xargs printf "%1.0f")
+if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
+	cur_temperature=$(echo "$cur_temperature/1000" | bc -l | xargs printf "%1.0f")
+else
+	cur_temperature='N/A'
+fi
+OPEN_PORTS=$(netstat -lt --numeric-ports| grep -v localhost)
 
 ps_output="$(ps aux)"
 processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
@@ -85,5 +90,8 @@ ${C1} + ${C3}Processes      ${C1}=  ${C4}$PROCCOUNT of `ulimit -u` max
 ${C1} + ${C3}Top Process    ${C1}=  ${C4}$top_process${C0}
 ${C1} ++++++++++++++++++++: ${C3}Helpful Information${C1} :+++++++++++++++++++++++
 ${C1} + ${C3}Administrators ${C1}=  ${C4}$ADMINSLIST
+${C1} + ${C3}Open Ports     ${C1}=
+${C4}$OPEN_PORTS
 ${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 "
+
