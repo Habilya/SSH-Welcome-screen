@@ -10,13 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FQDN hostname
 
 ### Changed
-- Moves MOTD.sh to SCRIPT folder
+- Moved MOTD.sh to SCRIPT folder
 
 ### Fixed
 - Uptime display when less than 1 day
 
-
-### Changed
 
 ## [0.1.0] - 2018-10-24
 ### Added
