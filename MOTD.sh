@@ -26,6 +26,10 @@ UPDATESAVAIL=`cat /var/zzscriptzz/MOTD/updates-available.dat`
 cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
 cur_temperature=$(echo "$cur_temperature/1000" | bc -l | xargs printf "%1.0f")
 
+ps_output="$(ps aux)"
+processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
+top_process="$(printf "%s\\n" "${ps_output}" | awk '{print $2, $4"%", $11}' | sort -k2rn | awk '{print $3, $2;exit}')"
+
 # get the load averages
 read one five fifteen rest < /proc/loadavg
 
@@ -78,6 +82,7 @@ ${C1} + ${C3}Username       ${C1}=  ${C4}`whoami` ${C0}($USERGROUP)
 ${C1} + ${C3}Last Login     ${C1}=  ${C4}`last -a $USER | head -2 | awk 'NR==2{print $3,$4,$5,$6}'` from `last -a $USER | head -2 | awk 'NR==2{print $10}'`
 ${C1} + ${C3}Sessions       ${C1}=  ${C4}`who | grep $USER | wc -l`
 ${C1} + ${C3}Processes      ${C1}=  ${C4}$PROCCOUNT of `ulimit -u` max
+${C1} + ${C3}Top Process    ${C1}=  ${C4}$top_process${C0}
 ${C1} ++++++++++++++++++++: ${C3}Helpful Information${C1} :+++++++++++++++++++++++
 ${C1} + ${C3}Administrators ${C1}=  ${C4}$ADMINSLIST
 ${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
