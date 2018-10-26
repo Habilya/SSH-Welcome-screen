@@ -27,9 +27,11 @@ if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
 	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
 	cur_temperature="$(echo "$cur_temperature/1000" | bc -l | xargs printf "%1.0f")°C"
 else
-	cur_temperature='N/A'
+	cur_temperature="N/A"
 fi
-OPEN_PORTS=$(netstat -lt --numeric-ports| grep -v localhost)
+
+OPEN_PORTS_IPV4=`netstat -lnt | awk 'NR>2{print $4}' | grep -E '0.0.0.0:' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{ print $1 }' | sed 's/,$/\n/'`
+OPEN_PORTS_IPV6=`netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{ print $1 }' | sed 's/,$/\n/'`
 
 ps_output="$(ps aux)"
 processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
@@ -38,14 +40,14 @@ top_process="$(printf "%s\\n" "${ps_output}" | awk '{print $2, $4"%", $11}' | so
 # get the load averages
 read one five fifteen rest < /proc/loadavg
 
-if [[ $GROUPZ == "$USER sudo" ]]; then
-USERGROUP="Administrator"
-elif [[ $USER = "root" ]]; then
-USERGROUP="Root"
-elif [[ $USER = "$USER" ]]; then
-USERGROUP="Regular User"
+if [[ "$GROUPZ" == *"sudo"* ]]; then
+	USERGROUP="Administrator"
+elif [[ "$USER" == "root" ]]; then
+	USERGROUP="Root"
+elif [[ "$USER" == "$USER" ]]; then
+	USERGROUP="Regular User"
 else
-USERGROUP="$GROUPZ"
+	USERGROUP="$GROUPZ"
 fi
 
 echo -e " ${C0}+                    +                     +         +
@@ -69,7 +71,7 @@ echo -e " ${C0}+                    +                     +         +
      \/_/  \/_/     \/_/   \/_____/      \/____/   \/_____/   \/_/ 	  
 "
 
-echo -e " ${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
+echo -e "${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
 ${C1} + ${C3}Hostname       ${C1}=  ${C4}`hostname` ${C0}(`hostname --fqdn`)
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}`wget http://ipinfo.io/ip -qO -` ${C0}(`ip addr list eth0 |grep "inet " |cut -d' ' -f6|cut -d/ -f1`)
 ${C1} + ${C3}Uptime         ${C1}=  ${C4}`uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* users.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/'`
@@ -90,8 +92,8 @@ ${C1} + ${C3}Processes      ${C1}=  ${C4}$PROCCOUNT of `ulimit -u` max
 ${C1} + ${C3}Top Process    ${C1}=  ${C4}$top_process${C0}
 ${C1} ++++++++++++++++++++: ${C3}Helpful Information${C1} :+++++++++++++++++++++++
 ${C1} + ${C3}Administrators ${C1}=  ${C4}$ADMINSLIST
-${C1} + ${C3}Open Ports     ${C1}=
-${C4}$OPEN_PORTS
+${C1} + ${C3}OpenPorts IPv4 ${C1}=  ${C4}$OPEN_PORTS_IPV4
+${C1} + ${C3}OpenPorts IPv6 ${C1}=  ${C4}$OPEN_PORTS_IPV6
 ${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 "
 
