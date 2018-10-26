@@ -3,9 +3,10 @@
 Hello friend :wave:,
 
 You are reading this, it means you consider contributing (or you are just curious about this file).
-This project is possible because of curious and elegant people like you!
 
-Happy coding ! :balloon:
+This project is possible thanks to curious and elegant people just like you, keep up the good vibes
+
+and happy coding ! :balloon:
 
 **Working on your first Pull Request?** 
 
