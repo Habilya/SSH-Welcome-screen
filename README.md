@@ -1,6 +1,6 @@
 # SSH-Welcome-screen
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 ![SSH-Welcome-screen](https://i.imgur.com/2mUs95L.jpg)
 
