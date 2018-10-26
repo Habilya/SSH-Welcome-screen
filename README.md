@@ -1,5 +1,6 @@
 # SSH-Welcome-screen
 
+[![Build Status](https://travis-ci.org/Habilya/SSH-Welcome-screen.svg?branch=HabilyaDev)](https://travis-ci.org/Habilya/SSH-Welcome-screen)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat)](https://www.firsttimersonly.com/)
 
