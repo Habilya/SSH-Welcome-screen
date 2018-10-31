@@ -22,5 +22,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the HDD usage if using LUKS/LVM
 
 ## :bookmark: [1.0.0] - 2018-10-24
-### Added :taba:
+### Added :tada:
 - Commit of the initial version
