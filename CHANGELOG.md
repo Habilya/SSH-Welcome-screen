@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### :zap: Changed
 - Moved MOTD.sh to SCRIPT folder
-- LAN IP Replace eth0 with interface from default route 
+- LAN IP Replace eth0 with an interface from the default route
 - Bash scripting conventions review phase I
 
 ### :hammer: Fixed
