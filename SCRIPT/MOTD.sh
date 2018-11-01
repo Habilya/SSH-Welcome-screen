@@ -25,8 +25,10 @@ UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-        cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
-        cur_temperature="$(echo "$cur_temperature/1000" | bc -l | xargs printf "%1.0f")°C"
+        cur_temperature_c=$(cat /sys/class/thermal/thermal_zone0/temp)
+        cur_temperature_c="$(echo "$cur_temperature_c / 1000" | bc -l | xargs printf "%.2f")"
+        cur_temperature_f="$(echo "$cur_temperature_c * 1.8 + 32" | bc -l | xargs printf "%.2f")"
+        cur_temperature="$cur_temperature_c°C ($cur_temperature_f°F)"
 else
         cur_temperature="N/A"
 fi
@@ -74,7 +76,7 @@ ${C1} + ${C3}Hostname       ${C1}=  ${C4}$(hostname) ${C0}($(hostname --fqdn))
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}$(wget http://ipinfo.io/ip -qO -) ${C0}($(ip addr list $INTERFACE | grep "inet " | cut -d' ' -f6| cut -d/ -f1))
 ${C1} + ${C3}Uptime         ${C1}=  ${C4}$(uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* user.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/')
 ${C1} + ${C3}Time           ${C1}=  ${C0}$(date)
-${C1} + ${C3}CPU T°         ${C1}=  ${C0}$cur_temperature
+${C1} + ${C3}CPU Temp       ${C1}=  ${C0}$cur_temperature
 ${C1} + ${C3}Processes      ${C1}=  ${C4}$PROCCOUNT of $(ulimit -u) max
 ${C1} + ${C3}Load Averages  ${C1}=  ${C4}${one}, ${five}, ${fifteen} ${C0}(1, 5, 15 min)
 ${C1} + ${C3}Distro         ${C1}=  ${C4}$(grep "PRETTY_NAME" /etc/*release | cut -d "=" -f 2- | sed 's/"//g') ${C0}($(uname -r))
