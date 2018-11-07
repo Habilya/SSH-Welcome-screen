@@ -13,6 +13,15 @@ C6='\033[1;33m' # Yellow
 C7='\033[0;34m' # Blue
 
 ########################################################################
+# Parameters
+########################################################################
+
+# CPU Temperature default is in degrees Celsius
+# You can output it in Degrees Farenheit by changing the parameter below
+# to true
+isCPUTempFarenheit=false
+
+########################################################################
 # Commands configuration
 ########################################################################
 PROCCOUNT=$(ps -Afl | wc -l)
@@ -25,10 +34,14 @@ UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-        cur_temperature_c=$(cat /sys/class/thermal/thermal_zone0/temp)
-        cur_temperature_c="$(echo "$cur_temperature_c / 1000" | bc -l | xargs printf "%.2f")"
-        cur_temperature_f="$(echo "$cur_temperature_c * 1.8 + 32" | bc -l | xargs printf "%.2f")"
-        cur_temperature="$cur_temperature_c°C ($cur_temperature_f°F)"
+	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
+
+	if [ "$isCPUTempFarenheit" = true ]; then
+		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
+		cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
+	else
+		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
+	fi
 else
         cur_temperature="N/A"
 fi
