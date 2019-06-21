@@ -94,8 +94,8 @@ ${C1} + ${C3}Processes      ${C1}=  ${C4}$PROCCOUNT of $(ulimit -u) max
 ${C1} + ${C3}Load Averages  ${C1}=  ${C4}${one}, ${five}, ${fifteen} ${C0}(1, 5, 15 min)
 ${C1} + ${C3}Distro         ${C1}=  ${C4}$(grep "PRETTY_NAME" /etc/*release | cut -d "=" -f 2- | sed 's/"//g') ${C0}($(uname -r))
 ${C1} + ${C3}CPU            ${C1}=  ${C4}$(grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10}' | head -1)
-${C1} + ${C3}Memory         ${C1}=  ${C4}$(free -m | awk '/Mem/ { printf("%3.1f%%", $3/$2*100) }') ${C0}($(free -t -m | grep "Mem" | awk '{print $4}')MB Free, $(free -t -m | grep "Mem" | awk '{print $3}')MB/$(free -t -m | grep "Mem" | awk '{print $2}')MB Used)
-${C1} + ${C3}Swap           ${C1}=  ${C4}$(free -m | awk '/Swap/ { printf("%3.1f%%", $3/$2*100) }') ${C0}($(free -t -m | grep "Swap" | awk '{print $4}')MB Free, $(free -t -m | grep "Swap" | awk '{print $3}')MB/$(free -t -m | grep "Swap" | awk '{print $2}')MB Used)
+${C1} + ${C3}Memory         ${C1}=  ${C4}$(free -m | awk '/Mem/ { if($2 ~ /^[1-9]+/) memm=$3/$2*100; else memm=0; printf("%3.1f%%", memm) }') ${C0}($(free -t -m | grep "Mem" | awk '{print $4}')MB Free, $(free -t -m | grep "Mem" | awk '{print $3}')MB/$(free -t -m | grep "Mem" | awk '{print $2}')MB Used)
+${C1} + ${C3}Swap           ${C1}=  ${C4}$(free -m | awk '/Swap/ { if($2 ~ /^[1-9]+/) swapm=$3/$2*100; else swapm=0; printf("%3.1f%%", swapm) }') ${C0}($(free -t -m | grep "Swap" | awk '{print $4}')MB Free, $(free -t -m | grep "Swap" | awk '{print $3}')MB/$(free -t -m | grep "Swap" | awk '{print $2}')MB Used)
 ${C1} + ${C3}HDD Usage      ${C1}=  ${C4}$(df -H | grep "/$" | awk '{ print $5 }') ${C0}($(df -hT | grep "/$" | awk '{print $5}')B Free, $(df -hT | grep "/$" | awk '{print $4}')B/$(df -hT | grep "/$" | awk '{print $3}')B Used)
 ${C1} + ${C3}Updates        ${C1}=  ${C4}$UPDATESAVAIL ${C0}"Updates Available"
 ${C1} ++++++++++++++++++++: ${C3}Top CPU Processes${C1} :+++++++++++++++++++++++++
