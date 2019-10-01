@@ -1,5 +1,5 @@
 #!/bin/bash
-clear && printf '\e[3J'
+
 ########################################################################
 # Color esthetics
 ########################################################################
@@ -24,40 +24,59 @@ isCPUTempFarenheit=false
 ########################################################################
 # Commands configuration
 ########################################################################
+
+# Calculate the proc count. Subtracting 5 so that the count accurately reflects the number
+# of procs rather than the number of lines in the output
 PROCCOUNT=$(ps -Afl | wc -l)
 PROCCOUNT=$((PROCCOUNT - 5))
+# Get the groups the current user is a member of
 GROUPZ=$(groups)
+# Get the current user's name
 USER=$(whoami)
+# Get all members of the sudo group
 ADMINS=$(grep --regex "^sudo" /etc/group | awk -F: '{print $4}' | tr ',' '|')
 ADMINSLIST=$(grep -E $ADMINS /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
+
+# Check the updates
 UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
+
+# Check all local interfaces
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
+# Check if the system has a thermo sensor
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+  # Get the tempurature from the probe
 	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
 
+  # Check the farenheit flag
 	if [ "$isCPUTempFarenheit" = true ]; then
+    # If farenheit then convert to F
 		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
 		cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
 	else
+    # Else just print the temp in C
 		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
 	fi
 else
-        cur_temperature="N/A"
+  # If no sensor then just print N/A
+  cur_temperature="N/A"
 fi
 
+# Check and format the open ports on the machine
 OPEN_PORTS_IPV4=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E '0.0.0.0:' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
 OPEN_PORTS_IPV6=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
 
+# Get the list of processes and sort them by most mem usage and most cpu usage
 ps_output="$(ps aux)"
 processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
 mem_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $4"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 cpu_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $3"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 
 
-# get the load averages
+# Get the 3 load averages
 read -r one five fifteen rest < /proc/loadavg
 
+# Get the current usergroup and translate it to something human readable
 if [[ "$GROUPZ" == *"sudo"* ]]; then
         USERGROUP="Administrator"
 elif [[ "$USER" == "root" ]]; then
@@ -68,6 +87,10 @@ else
         USERGROUP="$GROUPZ"
 fi
 
+# Clear the screen and reset the scrollback
+clear && printf '\e[3J'
+
+# Print a city scape (purely aesthetic)
 echo -e " ${C0}+                    +                     +         +
                                  +                  +           +
           +                                             +
@@ -84,6 +107,7 @@ echo -e " ${C0}+                    +                     +         +
           :          :                .          .      .          :
 "
 
+# Print out all of the information collected using the script
 echo -e "${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
 ${C1} + ${C3}Hostname       ${C1}=  ${C4}$(hostname) ${C0}($(hostname --fqdn))
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}$(wget http://ipinfo.io/ip -qO -) ${C0}($(ip addr list $INTERFACE | grep "inet " | cut -d' ' -f6| cut -d/ -f1))
