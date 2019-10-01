@@ -101,7 +101,7 @@ last_login_user="$(last -a $USER | head -2 | awk 'NR==2{print $3,$4,$5,$6}')"
 last_login_ip="$(last -a $USER | head -2 | awk 'NR==2{print $10}')"
 
 # Get the 3 load averages
-read -r one five fifteen rest < /proc/loadavg
+read -r loadavg_one loadavg_five loadavg_fifteen rest < /proc/loadavg
 
 # Get the current usergroup and translate it to something human readable
 if [[ "$GROUPZ" == *"sudo"* ]]; then
