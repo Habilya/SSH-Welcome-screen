@@ -1,5 +1,5 @@
 #!/bin/bash
-clear && printf '\e[3J'
+
 ########################################################################
 # Color esthetics
 ########################################################################
@@ -24,67 +24,91 @@ isCPUTempFarenheit=false
 ########################################################################
 # Commands configuration
 ########################################################################
+
+# Calculate the proc count. Subtracting 5 so that the count accurately reflects the number
+# of procs rather than the number of lines in the output
 PROCCOUNT=$(ps -Afl | wc -l)
 PROCCOUNT=$((PROCCOUNT - 5))
+# Get the groups the current user is a member of
 GROUPZ=$(groups)
+# Get the current user's name
 USER=$(whoami)
+# Get all members of the sudo group
 ADMINS=$(grep --regex "^sudo" /etc/group | awk -F: '{print $4}' | tr ',' '|')
 ADMINSLIST=$(grep -E $ADMINS /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
+
+# Check the updates
 UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
+
+# Check all local interfaces
 INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
+# Check if the system has a thermo sensor
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+  # Get the tempurature from the probe
 	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
 
+  # Check the farenheit flag
 	if [ "$isCPUTempFarenheit" = true ]; then
+    # If farenheit then convert to F
 		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
 		cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
 	else
+    # Else just print the temp in C
 		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
 	fi
 else
-        cur_temperature="N/A"
+  # If no sensor then just print N/A
+  cur_temperature="N/A"
 fi
 
+# Check and format the open ports on the machine
 OPEN_PORTS_IPV4=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E '0.0.0.0:' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
 OPEN_PORTS_IPV6=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
 
+# Get the list of processes and sort them by most mem usage and most cpu usage
 ps_output="$(ps aux)"
 processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
 mem_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $4"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 cpu_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $3"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 
+# Get your remote IP address using external resource ipinfo.io
 remote_ip="$(wget http://ipinfo.io/ip -qO -)"
+# Get your local IP address
 local_ip="$(ip addr list $INTERFACE | grep "inet " | cut -d' ' -f6| cut -d/ -f1)"
+# Get the total machine uptime in specific dynamic format 0 days, 0 hours, 0 minutes
 machine_uptime="$(uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* user.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/')"
+# Get your linux distro name
 distro_pretty_name="$(grep "PRETTY_NAME" /etc/*release | cut -d "=" -f 2- | sed 's/"//g')"
+# Get the brand and model of your CPU
 cpu_model_name="$(grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10}' | head -1)"
 
-#memory usage
+# Get memory usage to be displayed
 memory_percent="$(free -m | awk '/Mem/ { if($2 ~ /^[1-9]+/) memm=$3/$2*100; else memm=0; printf("%3.1f%%", memm) }')"
 memory_free_mb="$(free -t -m | grep "Mem" | awk '{print $4}')"
 memory_used_mb="$(free -t -m | grep "Mem" | awk '{print $3}')"
 memory_available_mb="$(free -t -m | grep "Mem" | awk '{print $2}')"
 
-#swap usage
+# Get SWAP usage to be displayed
 swap_percent="$(free -m | awk '/Swap/ { if($2 ~ /^[1-9]+/) swapm=$3/$2*100; else swapm=0; printf("%3.1f%%", swapm) }')"
 swap_free_mb="$(free -t -m | grep "Swap" | awk '{print $4}')"
 swap_used_mb="$(free -t -m | grep "Swap" | awk '{print $3}')"
 swap_available_mb="$(free -t -m | grep "Swap" | awk '{print $2}')"
 
-#HDD usage
+# Get HDD usage to be displayed
 hdd_percent="$(df -H | grep "/$" | awk '{ print $5 }')"
 hdd_free="$(df -hT | grep "/$" | awk '{print $5}')"
 hdd_used="$(df -hT | grep "/$" | awk '{print $4}')"
 hdd_available="$(df -hT | grep "/$" | awk '{print $3}')"
 
-#lastlogin
+#Get last login information (user, ip)
 last_login_user="$(last -a $USER | head -2 | awk 'NR==2{print $3,$4,$5,$6}')"
 last_login_ip="$(last -a $USER | head -2 | awk 'NR==2{print $10}')"
 
-# get the load averages
+# Get the 3 load averages
 read -r loadavg_one loadavg_five loadavg_fifteen rest < /proc/loadavg
 
+# Get the current usergroup and translate it to something human readable
 if [[ "$GROUPZ" == *"sudo"* ]]; then
         USERGROUP="Administrator"
 elif [[ "$USER" == "root" ]]; then
@@ -95,6 +119,11 @@ else
         USERGROUP="$GROUPZ"
 fi
 
+# Clear the screen and reset the scrollback
+clear && printf '\e[3J'
+
+# Print a city scape (purely aesthetic)
+# If "you no like", delete it or replace with your own ;)
 echo -e " ${C0}+                    +                     +         +
                                  +                  +           +
           +                                             +
@@ -111,6 +140,7 @@ echo -e " ${C0}+                    +                     +         +
           :          :                .          .      .          :
 "
 
+# Print out all of the information collected using the script
 echo -e "${C1} ++++++++++++++++++++++++: ${C3}System Data${C1} :+++++++++++++++++++++++++++
 ${C1} + ${C3}Hostname       ${C1}=  ${C4}$(hostname) ${C0}($(hostname --fqdn))
 ${C1} + ${C3}IPv4 Address   ${C1}=  ${C4}$remote_ip ${C0}($local_ip)
