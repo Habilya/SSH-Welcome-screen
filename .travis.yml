@@ -11,7 +11,7 @@ env:
     - SHUNIT2_VERSION: 2-2.1.6
 
 before_script:
-  - pip install bashate
+  - pip install --user bashate
   - curl -L "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit${SHUNIT2_VERSION}.tgz" | tar zx
 
 script:
