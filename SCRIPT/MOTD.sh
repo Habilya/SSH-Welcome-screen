@@ -35,7 +35,7 @@ GROUPZ=$(groups)
 USER=$(whoami)
 # Get all members of the sudo group
 ADMINS=$(grep --regex "^sudo" /etc/group | awk -F: '{print $4}' | tr ',' '|')
-ADMINSLIST=$(grep -E $ADMINS /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
+ADMINSLIST=$(grep -E "$ADMINS" /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
 
 # Check the updates
 UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
@@ -75,7 +75,7 @@ cpu_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2,
 # Get your remote IP address using external resource ipinfo.io
 remote_ip="$(wget http://ipinfo.io/ip -qO -)"
 # Get your local IP address
-local_ip="$(ip addr list $INTERFACE | grep "inet " | cut -d' ' -f6| cut -d/ -f1)"
+local_ip="$(ip addr list "$INTERFACE" | grep "inet " | cut -d' ' -f6| cut -d/ -f1)"
 # Get the total machine uptime in specific dynamic format 0 days, 0 hours, 0 minutes
 machine_uptime="$(uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* user.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/')"
 # Get your linux distro name
@@ -102,8 +102,8 @@ hdd_used="$(df -hT | grep "/$" | awk '{print $4}')"
 hdd_available="$(df -hT | grep "/$" | awk '{print $3}')"
 
 #Get last login information (user, ip)
-last_login_user="$(last -a $USER | head -2 | awk 'NR==2{print $3,$4,$5,$6}')"
-last_login_ip="$(last -a $USER | head -2 | awk 'NR==2{print $10}')"
+last_login_user="$(last -a "$USER" | head -2 | awk 'NR==2{print $3,$4,$5,$6}')"
+last_login_ip="$(last -a "$USER" | head -2 | awk 'NR==2{print $10}')"
 
 # Get the 3 load averages
 read -r loadavg_one loadavg_five loadavg_fifteen rest < /proc/loadavg
@@ -162,7 +162,7 @@ $mem_top_processes${C0}
 ${C1} ++++++++++++++++++++++++: ${C3}User Data${C1} :+++++++++++++++++++++++++++++
 ${C1} + ${C3}Username       ${C1}=  ${C4}$USER ${C0}($USERGROUP)
 ${C1} + ${C3}Last Login     ${C1}=  ${C4}$last_login_user from $last_login_ip
-${C1} + ${C3}Sessions       ${C1}=  ${C4}$(who | grep -c $USER)
+${C1} + ${C3}Sessions       ${C1}=  ${C4}$(who | grep -c "$USER")
 ${C1} ++++++++++++++++++++: ${C3}Helpful Information${C1} :+++++++++++++++++++++++
 ${C1} + ${C3}Administrators ${C1}=  ${C4}$ADMINSLIST
 ${C1} + ${C3}OpenPorts IPv4 ${C1}=  ${C4}$OPEN_PORTS_IPV4
