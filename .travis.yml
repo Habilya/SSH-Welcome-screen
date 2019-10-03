@@ -1,8 +1,17 @@
-
+---
 language: bash
 
+branches:
+  only:
+    - master
+    - devel
+
+env:
+  global:
+    - SHUNIT2_VERSION: 2-2.1.6
+
 before_script:
-    - curl -L "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz" | tar zx
+  - curl -L "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit${SHUNIT2_VERSION}.tgz" | tar zx
 
 script:
-    - bash TESTS.sh
+  - bash TESTS.sh
