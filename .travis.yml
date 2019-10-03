@@ -14,4 +14,5 @@ before_script:
   - curl -L "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit${SHUNIT2_VERSION}.tgz" | tar zx
 
 script:
+  - shellcheck SCRIPT/MOTD.sh
   - bash TESTS.sh
