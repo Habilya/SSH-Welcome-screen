@@ -35,7 +35,9 @@ GROUPZ=$(groups)
 USER=$(whoami)
 # Get all members of the sudo group
 ADMINS=$(grep --regex "^sudo" /etc/group | awk -F: '{print $4}' | tr ',' '|')
-ADMINSLIST=$(grep -E "$ADMINS" /etc/passwd | tr ':' ' ' | tr ',' ' ' | awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
+
+ADMINSLIST=$(grep -E "$ADMINS" /etc/passwd | tr ':' ' ' | tr ',' ' ' \
+| awk '{print $5,$6,"("$1")"}' | tr '\n' ',' | sed '$s/.$//')
 
 # Check the updates
 UPDATESAVAIL=$(cat /var/zzscriptzz/MOTD/updates-available.dat)
@@ -46,17 +48,19 @@ INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 # Check if the system has a thermo sensor
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
   # Get the tempurature from the probe
-	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
-
+  cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
   # Check the farenheit flag
-	if [ "$isCPUTempFarenheit" = true ]; then
+  if [ "$isCPUTempFarenheit" = true ]; then
     # If farenheit then convert to F
-		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
-		cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
-	else
+    cur_temperature="$(echo "$cur_temperature / 1000" | bc -l \
+    | xargs printf "%.2f")"
+    cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | \
+    bc -l | xargs printf "%1.0f") °F"
+  else
     # Else just print the temp in C
-		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
-	fi
+    cur_temperature="$(echo "$cur_temperature / 1000" | \
+    bc -l | xargs printf "%1.0f")°C"
+  fi
 else
   # If no sensor then just print N/A
   cur_temperature="N/A"
