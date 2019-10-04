@@ -5,7 +5,7 @@
 ########################################################################
 C0='\033[1;37m' # White
 C1='\033[0;35m' # Purple
-C2='\033[0;32m' # Green
+# C2='\033[0;32m' # Green # Not Used
 C3='\033[0;37m' # Light Gray
 C4='\033[1;32m' # Light Green
 C5='\033[0;31m' # Red
@@ -45,21 +45,20 @@ INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
 # Check if the system has a thermo sensor
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-  # Get the tempurature from the probe
-	cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
-
-  # Check the farenheit flag
-	if [ "$isCPUTempFarenheit" = true ]; then
-    # If farenheit then convert to F
-		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
-		cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
-	else
-    # Else just print the temp in C
-		cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
-	fi
+    # Get the tempurature from the probe
+    cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
+    # Check the farenheit flag
+    if [ "$isCPUTempFarenheit" = true ]; then
+        # If farenheit then convert to F
+        cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
+        cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
+    else
+        # Else just print the temp in C
+        cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
+    fi
 else
-  # If no sensor then just print N/A
-  cur_temperature="N/A"
+    # If no sensor then just print N/A
+    cur_temperature="N/A"
 fi
 
 # Check and format the open ports on the machine
@@ -68,7 +67,6 @@ OPEN_PORTS_IPV6=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | sed 's/.
 
 # Get the list of processes and sort them by most mem usage and most cpu usage
 ps_output="$(ps aux)"
-processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
 mem_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $4"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 cpu_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $3"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 
@@ -110,13 +108,13 @@ read -r loadavg_one loadavg_five loadavg_fifteen rest < /proc/loadavg
 
 # Get the current usergroup and translate it to something human readable
 if [[ "$GROUPZ" == *"sudo"* ]]; then
-        USERGROUP="Administrator"
+    USERGROUP="Administrator"
 elif [[ "$USER" == "root" ]]; then
-        USERGROUP="Root"
+    USERGROUP="Root"
 elif [[ "$USER" == "$USER" ]]; then
-        USERGROUP="Regular User"
+    USERGROUP="Regular User"
 else
-        USERGROUP="$GROUPZ"
+    USERGROUP="$GROUPZ"
 fi
 
 # Clear the screen and reset the scrollback
