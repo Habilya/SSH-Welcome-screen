@@ -5,7 +5,7 @@
 ########################################################################
 C0='\033[1;37m' # White
 C1='\033[0;35m' # Purple
-C2='\033[0;32m' # Green
+# C2='\033[0;32m' # Green # Not Used
 C3='\033[0;37m' # Light Gray
 C4='\033[1;32m' # Light Green
 C5='\033[0;31m' # Red
@@ -47,45 +47,56 @@ INTERFACE=$(route | grep '^default' | grep -o '[^ ]*$')
 
 # Check if the system has a thermo sensor
 if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-  # Get the tempurature from the probe
-  cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
-  # Check the farenheit flag
-  if [ "$isCPUTempFarenheit" = true ]; then
-    # If farenheit then convert to F
-    cur_temperature="$(echo "$cur_temperature / 1000" | bc -l \
-    | xargs printf "%.2f")"
-    cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | \
-    bc -l | xargs printf "%1.0f") °F"
-  else
-    # Else just print the temp in C
-    cur_temperature="$(echo "$cur_temperature / 1000" | \
-    bc -l | xargs printf "%1.0f")°C"
-  fi
+    # Get the tempurature from the probe
+    cur_temperature=$(cat /sys/class/thermal/thermal_zone0/temp)
+    # Check the farenheit flag
+    if [ "$isCPUTempFarenheit" = true ]; then
+        # If farenheit then convert to F
+        cur_temperature="$(echo "$cur_temperature / 1000" | bc -l \
+        | xargs printf "%.2f")"
+        
+        cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | \
+        bc -l | xargs printf "%1.0f") °F"
+    else
+        # Else just print the temp in C
+        cur_temperature="$(echo "$cur_temperature / 1000" | \
+        bc -l | xargs printf "%1.0f")°C"
+    fi
 else
-  # If no sensor then just print N/A
-  cur_temperature="N/A"
+    # If no sensor then just print N/A
+    cur_temperature="N/A"
 fi
 
 # Check and format the open ports on the machine
-OPEN_PORTS_IPV4=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E '0.0.0.0:' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
-OPEN_PORTS_IPV6=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
+OPEN_PORTS_IPV4=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E '0.0.0.0:' | \
+sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
+OPEN_PORTS_IPV6=$(netstat -lnt | awk 'NR>2{print $4}' | grep -E ':::' | \
+sed 's/.*://' | sort -n | uniq | awk -vORS=, '{print $1}' | sed 's/,$/\n/')
 
 # Get the list of processes and sort them by most mem usage and most cpu usage
 ps_output="$(ps aux)"
-processes="$(printf "%s\\n" "${ps_output}" | wc -l)"
-mem_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $4"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
-cpu_top_processes="$(printf "%s\\n" "${ps_output}" | awk '{print "\033[1;37m"$2, $3"%", "\033[1;32m"$11}' | sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
+
+mem_top_processes="$(printf "%s\\n" "${ps_output}" | \
+awk '{print "\033[1;37m"$2, $4"%", "\033[1;32m"$11}' | sort -k2rn | \
+head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
+
+cpu_top_processes="$(printf "%s\\n" "${ps_output}" | \
+awk '{print "\033[1;37m"$2, $3"%", "\033[1;32m"$11}' | \
+sort -k2rn | head -3 | awk '{print " \033[0;35m+\t\033[1;32mID: "$1, $3, $2}')"
 
 # Get your remote IP address using external resource ipinfo.io
 remote_ip="$(wget http://ipinfo.io/ip -qO -)"
 # Get your local IP address
-local_ip="$(ip addr list "$INTERFACE" | grep "inet " | cut -d' ' -f6| cut -d/ -f1)"
+local_ip="$(ip addr list "$INTERFACE" | \
+grep "inet " | cut -d' ' -f6| cut -d/ -f1)"
 # Get the total machine uptime in specific dynamic format 0 days, 0 hours, 0 minutes
-machine_uptime="$(uptime | sed -E 's/^[^,]*up *//; s/, *[[:digit:]]* user.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/')"
+machine_uptime="$(uptime | sed -E \
+'s/^[^,]*up *//; s/, *[[:digit:]]* user.*//; s/min/minutes/; s/([[:digit:]]+):0?([[:digit:]]+)/\1 hours, \2 minutes/')"
 # Get your linux distro name
 distro_pretty_name="$(grep "PRETTY_NAME" /etc/*release | cut -d "=" -f 2- | sed 's/"//g')"
 # Get the brand and model of your CPU
-cpu_model_name="$(grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10}' | head -1)"
+cpu_model_name="$(grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | \
+awk '{print $1,$2,$3,$4,$5,$6,$7,$8,$9,$10}' | head -1)"
 
 # Get memory usage to be displayed
 memory_percent="$(free -m | awk '/Mem/ { if($2 ~ /^[1-9]+/) memm=$3/$2*100; else memm=0; printf("%3.1f%%", memm) }')"
@@ -114,13 +125,13 @@ read -r loadavg_one loadavg_five loadavg_fifteen rest < /proc/loadavg
 
 # Get the current usergroup and translate it to something human readable
 if [[ "$GROUPZ" == *"sudo"* ]]; then
-        USERGROUP="Administrator"
+    USERGROUP="Administrator"
 elif [[ "$USER" == "root" ]]; then
-        USERGROUP="Root"
+    USERGROUP="Root"
 elif [[ "$USER" == "$USER" ]]; then
-        USERGROUP="Regular User"
+    USERGROUP="Regular User"
 else
-        USERGROUP="$GROUPZ"
+    USERGROUP="$GROUPZ"
 fi
 
 # Clear the screen and reset the scrollback
