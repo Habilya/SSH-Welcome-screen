@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.11] :bookmark: - 2019-10-05
+### :sparkles: Added
+- Script automatic analysis and quality checks
+- Commentary documentation in code
+
+### :zap: Changed
+- Separated the commands from the display to separate the loginc and view
+
+### :hammer: Fixed
+- Fix awk division by zero when swap/memory is 0
+
+
 ## [Unreleased] [1.1.10] :bookmark: - 2018-11-01
 ### :sparkles: Added
 - CPU Temperature in degrees Celsius or Farenheit (configurable)
@@ -25,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Uptime display when less than 1 day
 - Temperature display when temperature file doesn't exist
 - Fixed the HDD usage if using LUKS/LVM
+
 
 ## [1.0.0] :bookmark: - 2018-10-24
 ### :sparkles: Added:

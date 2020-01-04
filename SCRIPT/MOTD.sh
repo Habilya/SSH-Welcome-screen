@@ -3,6 +3,7 @@
 ########################################################################
 # Color esthetics
 ########################################################################
+CNC='\e[0m' # No color
 C0='\033[1;37m' # White
 C1='\033[0;35m' # Purple
 # C2='\033[0;32m' # Green # Not Used
@@ -117,6 +118,9 @@ else
     USERGROUP="$GROUPZ"
 fi
 
+# Get User Process
+USER_PROCESS=`ps -ef | grep -v root | wc -l`
+
 # Clear the screen and reset the scrollback
 clear && printf '\e[3J'
 
@@ -165,6 +169,8 @@ ${C1} ++++++++++++++++++++: ${C3}Helpful Information${C1} :+++++++++++++++++++++
 ${C1} + ${C3}Administrators ${C1}=  ${C4}$ADMINSLIST
 ${C1} + ${C3}OpenPorts IPv4 ${C1}=  ${C4}$OPEN_PORTS_IPV4
 ${C1} + ${C3}OpenPorts IPv6 ${C1}=  ${C4}$OPEN_PORTS_IPV6
-${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${CNC}
+${C1} + ${C3}User Processes ${C1}=  ${C4}$USER_PROCESS
+${C1} ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++${CNC}
 "
 
