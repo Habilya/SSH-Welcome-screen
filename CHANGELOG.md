@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] [1.1.12] :bookmark: - 2020-01-04
+### :sparkles: Added
+- CPU Temperature color gage
+- Contributors to display on the README.MD
+
+### :hammer: Fixed
+- Restore terminal color to default after printing the script
+
+
 ## [1.1.11] :bookmark: - 2019-10-05
 ### :sparkles: Added
 - Script automatic analysis and quality checks
