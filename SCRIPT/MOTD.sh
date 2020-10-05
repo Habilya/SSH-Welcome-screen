@@ -6,12 +6,13 @@
 CNC='\e[0m' # No color
 C0='\033[1;37m' # White
 C1='\033[0;35m' # Purple
-# C2='\033[0;32m' # Green # Not Used
+# C2='\033[0;32m' # Green # not used
 C3='\033[0;37m' # Light Gray
 C4='\033[1;32m' # Light Green
 C5='\033[0;31m' # Red
 C6='\033[1;33m' # Yellow
 C7='\033[0;34m' # Blue
+C8='\033[1;31m' # Red
 
 ########################################################################
 # Parameters
@@ -52,10 +53,42 @@ if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
     if [ "$isCPUTempFarenheit" = true ]; then
         # If farenheit then convert to F
         cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%.2f")"
-        cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f") °F"
+        cur_temperature="$(echo "$cur_temperature * 1.8 + 32" | bc -l | xargs printf "%1.0f")"
+
+        # Temperature gage 
+        # C2 - green  (temp <= 122) All Good!
+        # C6 - yellow (122 < temp <= 176) It's getting kindof hot
+        # C5 - red    (temp > 176) Danger zone!
+        if [[ $cur_temperature -le  122 ]]; then
+            cur_temperature="${C4}$cur_temperature"
+        elif [[ $cur_temperature -gt 122 && $cur_temperature -le 176 ]]; then
+            cur_temperature="${C6}$cur_temperature"
+        elif [[ $cur_temperature -gt 176 ]]; then
+            cur_temperature="${C8}$cur_temperature"
+        fi
+
+        # add the Farenheit degree unit
+        cur_temperature="$cur_temperature°F"
+
     else
         # Else just print the temp in C
-        cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")°C"
+        cur_temperature="$(echo "$cur_temperature / 1000" | bc -l | xargs printf "%1.0f")"
+
+        # Temperature gage 
+        # C2 - green  (temp <= 50) All Good!
+        # C6 - yellow (50 < temp <= 80) It's getting kindof hot
+        # C5 - red    (temp > 80) Danger zone!
+        if [[ $cur_temperature -le  50 ]]; then
+            cur_temperature="${C4}$cur_temperature"
+        elif [[ $cur_temperature -gt 50 && $cur_temperature -le 80 ]]; then
+            cur_temperature="${C6}$cur_temperature"
+        elif [[ $cur_temperature -gt 80 ]]; then
+            cur_temperature="${C8}$cur_temperature"
+        fi
+
+        # add the Celsius degree unit
+        cur_temperature="$cur_temperature°C"
+
     fi
 else
     # If no sensor then just print N/A
