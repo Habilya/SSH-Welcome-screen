@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/github/license/Habilya/SSH-Welcome-screen)](https://github.com/Habilya/SSH-Welcome-screen/blob/master/LICENSE)
 [![Repository size](https://img.shields.io/github/repo-size/Habilya/SSH-Welcome-screen)](https://github.com/Habilya/SSH-Welcome-screen/releases)
 
-[![HacktoberFest 2019](https://img.shields.io/github/hacktoberfest/2019/Habilya/SSH-Welcome-screen)](https://github.com/Habilya/SSH-Welcome-screen/labels/hacktoberfest)
+[![HacktoberFest 2020](https://img.shields.io/github/hacktoberfest/2020/Habilya/SSH-Welcome-screen?color=d)](https://github.com/Habilya/SSH-Welcome-screen/labels/hacktoberfest)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 [![first-timers-only](https://img.shields.io/badge/first--timers--only-friendly-blue.svg?style=flat)](https://www.firsttimersonly.com/)
 
