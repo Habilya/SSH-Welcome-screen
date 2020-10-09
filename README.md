@@ -27,6 +27,10 @@ _Note : This was developed for a Raspberry Pi, should work just fine on other de
 * Raspberry Pi 3 B
 * Raspberry Pi 1 B
 
+## Contributing
+We are really excited to see your awesome PRs.
+Contributions for Hacktoberfest 2020 are welcome 🎉🎉
+
 ## Contributors
 [![Contributors](https://img.shields.io/github/contributors/Habilya/SSH-Welcome-screen)](https://github.com/Habilya/SSH-Welcome-screen/graphs/contributors)
 
